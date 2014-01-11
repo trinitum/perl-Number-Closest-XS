@@ -1,8 +1,13 @@
 package Number::Closest::XS;
+use 5.010;
 use strict;
 use warnings;
 our $VERSION = "0.01";
+my $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
+
+require XSLoader;
+XSLoader::load( "Number::Closest::XS", $XS_VERSION );
 
 =head1 NAME
 
@@ -21,6 +26,11 @@ Number::Closest::XS - Perl extension ...
 =head1 METHODS
 
 =cut
+
+sub find {
+    my ($class, %args) = @_;
+    return _find($args{center}, $args{list}, $args{amount} // 1);
+}
 
 1;
 
