@@ -37,7 +37,7 @@ eq_or_diff
     [40, 52, 55], "40, 52 and 55 are closest three around 50";
 eq_or_diff
     find_closest_numbers_around(center => 50, list => [ 20, 30, 40, 52, 55, 57, 59, 60, ], amount => 4,),
-    [40, 52, 55], "40, 52, 55 and 57 are closest four around 50";
+    [40, 52, 55, 57], "40, 52, 55 and 57 are closest four around 50";
 eq_or_diff
     find_closest_numbers_around(center => 50, list => [ 20, 30, 40, 42, 47, 49, 52, 55, 57, 59, 60, ], amount => 5,),
     [47, 49, 52, 55, 57 ], "47, 49, 52, 55 and 57 are closest five around 50";

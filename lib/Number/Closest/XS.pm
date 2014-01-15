@@ -7,7 +7,7 @@ my $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
 use base 'Exporter';
-our @EXPORT_OK = qw(find_closest_numbers);
+our @EXPORT_OK = qw(find_closest_numbers find_closest_numbers_around);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 require XSLoader;
@@ -33,7 +33,12 @@ Number::Closest::XS - Perl extension ...
 
 sub find_closest_numbers {
     my (%args) = @_;
-    return _find($args{center}, $args{list}, $args{amount} // 1);
+    return _find_closest_numbers($args{center}, $args{list}, $args{amount} // 1);
+}
+
+sub find_closest_numbers_around {
+    my (%args) = @_;
+    return _find_closest_numbers_around($args{center}, $args{list}, $args{amount} // 2);
 }
 
 1;

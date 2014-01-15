@@ -8,11 +8,35 @@ struct sv_with_distance {
     SV **svp;
 };
 
+void static add_to_the_list(
+        struct sv_with_distance *list,
+        int *length,
+        int max,
+        const struct sv_with_distance *item)
+{
+    int i;
+    if (*length == 0
+        || *length < max && list[*length - 1].distance <= item->distance)
+    {
+        /* add this item to the end of the list */
+        list[*length].distance = item->distance;
+        list[*length].svp = item->svp;
+        (*length)++;
+    } else if(list[*length - 1].distance > item->distance) {
+        /* insert new element into list */
+        for (i=0; list[i].distance <= item->distance; i++);
+        memmove(list+i+1, list+i, (*length-i) * sizeof(struct sv_with_distance));
+        list[i].distance = item->distance;
+        list[i].svp = item->svp;
+        if(*length < max) (*length)++;
+    }
+}
+
 MODULE = Number::Closest::XS    PACKAGE = Number::Closest::XS    PREFIX = nclosx_
 PROTOTYPES: DISABLE
 
 AV*
-nclosx__find(center, source, amount)
+nclosx__find_closest_numbers(center, source, amount)
         double center;
         AV* source;
         int amount;
@@ -20,9 +44,8 @@ nclosx__find(center, source, amount)
         int length = 0;
         int source_length;
         int i, j;
-        SV **item;
         double distance;
-        struct sv_with_distance *sorted;
+        struct sv_with_distance *sorted, item;
     CODE:
         RETVAL=newAV();
         sv_2mortal((SV*)RETVAL);
@@ -31,28 +54,87 @@ nclosx__find(center, source, amount)
             /* amount + 1 is to simplify memmove */
             sorted = calloc(amount+1, sizeof(struct sv_with_distance));
             for (i=0; i<= source_length; i++) {
-                item = av_fetch(source, i, 0);
-                if (item != NULL) {
-                    distance = fabs(center - SvNV(*item));
-                    if (length == 0 || length < amount && sorted[length - 1].distance <= distance) {
-                        /* add this item to the end of the list */
-                        sorted[length].distance = distance;
-                        sorted[length].svp = item;
-                        length++;
-                    } else if (sorted[length - 1].distance > distance) {
-                        /* insert new element into list */
-                        for(j=0; sorted[j].distance <= distance; j++);
-                        memmove(sorted+j+1, sorted+j, (length-j) * sizeof(struct sv_with_distance));
-                        sorted[j].distance = distance;
-                        sorted[j].svp = item;
-                        if (length < amount) length++;
-                    }
+                item.svp = av_fetch(source, i, 0);
+                if (item.svp != NULL) {
+                    item.distance = fabs(center - SvNV(*item.svp));
+                    add_to_the_list(sorted, &length, amount, &item);
                 }
             }
             for (i=0; i<length; i++) {
                 av_push(RETVAL, newSVsv(*sorted[i].svp));
             }
             free(sorted);
+        }
+    OUTPUT:
+        RETVAL
+
+AV*
+nclosx__find_closest_numbers_around(center, source, amount)
+        double center;
+        AV* source;
+        int amount;
+    PREINIT:
+        int source_length;
+        int i, j;
+        double distance;
+        double abs_dist;
+        struct sv_with_distance *left, *right, item;
+        int left_len=0, right_len=0, left_pos=0, right_pos=0;
+    CODE:
+        RETVAL=newAV();
+        sv_2mortal((SV*)RETVAL);
+        source_length = av_len(source);
+        if (source_length >= 0 && amount > 0) {
+            /* amount + 1 is to simplify memmove */
+            left = calloc(amount+1, sizeof(struct sv_with_distance));
+            right = calloc(amount+1, sizeof(struct sv_with_distance));
+            for (i=0; i<= source_length; i++) {
+                item.svp = av_fetch(source, i, 0);
+                if (item.svp != NULL) {
+                    item.distance = SvNV(*item.svp) - center;
+                    if (item.distance <= 0) {
+                        item.distance = fabs(item.distance);
+                        add_to_the_list(left, &left_len, amount, &item);
+                    } else {
+                        add_to_the_list(right, &right_len, amount, &item);
+                    }
+                }
+            }
+            if (left_len > 0) {
+                av_push(RETVAL, newSVsv(*left[0].svp));
+                left_pos++;
+                amount--;
+            }
+            if (right_len > 0) {
+                av_push(RETVAL, newSVsv(*right[0].svp));
+                right_pos++;
+                amount--;
+            }
+            while (amount > 0 && (right_pos < right_len || left_pos < left_len)) {
+                if (right_pos >= right_len) {
+                    av_unshift(RETVAL, 1);
+                    av_store(RETVAL, 0, newSVsv(*left[left_pos].svp));
+                    left_pos++;
+                    amount--;
+                } else if (left_pos >= left_len) {
+                    av_push(RETVAL, newSVsv(*right[right_pos].svp));
+                    right_pos++;
+                    amount--;
+                } else {
+                    if (left[left_pos].distance < right[right_pos].distance) {
+                        av_unshift(RETVAL, 1);
+                        av_store(RETVAL, 0, newSVsv(*left[left_pos].svp));
+                        left_pos++;
+                        amount--;
+                    } else {
+                        av_push(RETVAL, newSVsv(*right[right_pos].svp));
+                        right_pos++;
+                        amount--;
+                    }
+                }
+            }
+            free(left);
+            free(right);
         }
     OUTPUT:
         RETVAL
