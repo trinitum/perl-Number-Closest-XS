@@ -102,6 +102,7 @@ nclosx_find_closest_numbers_around(center, source, ...)
                     }
                 }
             }
+            /* first get a closest number from each side if possible */
             if (left_len > 0) {
                 av_push(RETVAL, newSVsv(*left[0].svp));
                 left_pos++;
@@ -114,15 +115,20 @@ nclosx_find_closest_numbers_around(center, source, ...)
             }
             while (amount > 0 && (right_pos < right_len || left_pos < left_len)) {
                 if (right_pos >= right_len) {
-                    av_unshift(RETVAL, 1);
-                    av_store(RETVAL, 0, newSVsv(*left[left_pos].svp));
-                    left_pos++;
-                    amount--;
+                    /* if there's nothing left on the right get from the left list */
+                    int n = amount < left_len - left_pos ? amount : left_len - left_pos;
+                    av_unshift(RETVAL, n );
+                    while (n-- > 0)
+                        av_store(RETVAL, n, newSVsv(*left[left_pos++].svp));
+                    break;
                 } else if (left_pos >= left_len) {
-                    av_push(RETVAL, newSVsv(*right[right_pos].svp));
-                    right_pos++;
-                    amount--;
+                    /* if there's nothing left on the left get from the right list */
+                    int n = amount < right_len - right_pos ? amount : right_len - right_pos;
+                    while (n-- > 0)
+                        av_push(RETVAL, newSVsv(*right[right_pos++].svp));
+                    break;
                 } else {
+                    /* get closest number */
                     if (left[left_pos].distance < right[right_pos].distance) {
                         av_unshift(RETVAL, 1);
                         av_store(RETVAL, 0, newSVsv(*left[left_pos].svp));
