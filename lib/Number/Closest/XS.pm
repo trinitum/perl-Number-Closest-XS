@@ -6,12 +6,12 @@ our $VERSION = "0.01";
 my $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
+require XSLoader;
+XSLoader::load( "Number::Closest::XS", $XS_VERSION );
+
 use base 'Exporter';
 our @EXPORT_OK = qw(find_closest_numbers find_closest_numbers_around);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
-
-require XSLoader;
-XSLoader::load( "Number::Closest::XS", $XS_VERSION );
 
 =head1 NAME
 
@@ -30,16 +30,6 @@ Number::Closest::XS - Perl extension ...
 =head1 METHODS
 
 =cut
-
-sub find_closest_numbers {
-    my (%args) = @_;
-    return _find_closest_numbers($args{center}, $args{list}, $args{amount} // 1);
-}
-
-sub find_closest_numbers_around {
-    my (%args) = @_;
-    return _find_closest_numbers_around($args{center}, $args{list}, $args{amount} // 2);
-}
 
 1;
 

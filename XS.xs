@@ -36,17 +36,18 @@ MODULE = Number::Closest::XS    PACKAGE = Number::Closest::XS    PREFIX = nclosx
 PROTOTYPES: DISABLE
 
 AV*
-nclosx__find_closest_numbers(center, source, amount)
+nclosx_find_closest_numbers(center, source, ...)
         double center;
         AV* source;
-        int amount;
     PREINIT:
         int length = 0;
+        int amount = 1;
         int source_length;
         int i, j;
         double distance;
         struct sv_with_distance *sorted, item;
     CODE:
+        if (items > 2) amount = SvIV(ST(2));
         RETVAL=newAV();
         sv_2mortal((SV*)RETVAL);
         source_length = av_len(source);
@@ -69,22 +70,23 @@ nclosx__find_closest_numbers(center, source, amount)
         RETVAL
 
 AV*
-nclosx__find_closest_numbers_around(center, source, amount)
+nclosx_find_closest_numbers_around(center, source, ...)
         double center;
         AV* source;
-        int amount;
     PREINIT:
         int source_length;
+        int amount = 2;
         int i, j;
         double distance;
         double abs_dist;
         struct sv_with_distance *left, *right, item;
         int left_len=0, right_len=0, left_pos=0, right_pos=0;
     CODE:
+        if (items > 2) amount = SvIV(ST(2));
         RETVAL=newAV();
         sv_2mortal((SV*)RETVAL);
         source_length = av_len(source);
-        if (source_length >= 0 && amount > 0) {
+        if (source_length >= 0 && amount > 1) {
             /* amount + 1 is to simplify memmove */
             left = calloc(amount+1, sizeof(struct sv_with_distance));
             right = calloc(amount+1, sizeof(struct sv_with_distance));
