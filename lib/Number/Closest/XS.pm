@@ -15,7 +15,7 @@ our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 =head1 NAME
 
-Number::Closest::XS - Perl extension ...
+Number::Closest::XS - find numbers closest to a given
 
 =head1 VERSION
 
@@ -23,17 +23,45 @@ Number::Closest::XS - Perl extension ...
 
 =head1 SYNOPSIS
 
-    use Number::Closest::XS;
+    use Number::Closest::XS qw(:all);
+    my $res = find_closest_numbers($num, \@list, $amount);
+    my $res2 = find_closest_numbers_around($num, \@list, $amount);
 
 =head1 DESCRIPTION
 
-=head1 METHODS
+B<Warning:> this is an alpha version. Behaviour is likely to change in the future.
+
+Module provides functions to extract from the list numbers closest to the
+given.
+
+=head1 SUBROUTINES
+
+=head2 find_closest_numbers($num, \@list, [$amount])
+
+selects from the I<@list> up to I<$amount> numbers closest to the I<$num>. If
+I<$amount> is not specified, is assumed to be 1.  Returns reference to the
+array containing found numbers sorted by the distance from the I<$num>.
+Distance between C<$num> and C<$x> computed as C<abs($num - $x)>.
+
+=head2 find_closest_numbers_around($num, \@list, [$amount])
+
+selects from the I<@list> up to I<$amount> numbers closest to the I<$num>, but
+first tries to ensure that there are numbers from both sides of the I<$num>, so
+if $num is 5, @list is 2, 6, 7 and amount is 2 it will return 2 and 6, despite
+7 being closer to 5. If I<$amount> is not specified, is assumed to be 2.
+Returns reference to the array containing found numbers sorted by the distance
+from the I<$num>.  Distance between C<$num> and C<$x> computed as
+C<abs($num - $x)>.
 
 =cut
 
 1;
 
 __END__
+
+=head1 SEE ALSO
+
+L<Number::Closest>, L<Number::Closest::NonOO>
 
 =head1 AUTHOR
 
