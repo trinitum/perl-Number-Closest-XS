@@ -28,8 +28,6 @@ Number::Closest::XS - find numbers closest to a given
 
 =head1 DESCRIPTION
 
-B<Warning:> this is an alpha version. Behaviour is likely to change in the future.
-
 Module provides functions to extract from the list numbers closest to the
 given.
 
