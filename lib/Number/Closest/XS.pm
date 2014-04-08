@@ -18,7 +18,7 @@ Number::Closest::XS - find numbers closest to a given
 
 =head1 VERSION
 
-0.01
+This document describes Number::Closest::XS version 0.06
 
 =head1 SYNOPSIS
 
