@@ -29,8 +29,9 @@ subtest precision => sub {
     };
   SKIP: {
         skip "Test requires perl with long double", 1 unless $Config{uselongdouble};
-        eq_or_diff find_closest_numbers( 10 + 6e-18, [ 10 + 1e-18, 10 + 7e-18 ] ),
-          [10.000000000000000007], "correct result with long double";
+        eq_or_diff [ map { sprintf "%.18Lf", $_ }
+              @{ find_closest_numbers( 10 + 6e-18, [ 10 + 1e-18, 10 + 7e-18 ] ) } ],
+          ["10.000000000000000007"], "correct result with long double";
     };
 };
 
