@@ -51,15 +51,24 @@ subtest precision => sub {
         eq_or_diff find_closest_numbers_around( 37834034037159581,
             [ 37834034037159587, 37834034037159589, 37834034037159585, 37834034037159578 ], 2 ),
           [ 37834034037159578, 37834034037159585 ], "correct result with 64 bit integers";
+        eq_or_diff find_closest_numbers( 18446744073709551610,
+            [ 18446744073709551615, 18446744073709551612, 18446744073709551609 ], 2 ),
+          [ 18446744073709551609, 18446744073709551612 ],
+          "correct result with unsigned 64 bit integers";
     };
   SKIP: {
         skip "Test requires perl with long double", 1 unless $Config{uselongdouble};
         eq_or_diff [ map { sprintf "%.18Lf", $_ }
               @{ find_closest_numbers( 10 + 6e-18, [ 10 + 1e-18, 10 + 7e-18 ] ) } ],
           ["10.000000000000000007"], "correct result with long double";
-        eq_or_diff [ map { sprintf "%.18Lf", $_ }
-              @{ find_closest_numbers_around( 10 + 6e-18, [ 10 + 1e-18, 10 + 7e-18, 10 + 3e-18 ], 2 ) } ],
-          ["10.000000000000000003", "10.000000000000000007"], "correct result with long double";
+        eq_or_diff [
+            map { sprintf "%.18Lf", $_ } @{
+                find_closest_numbers_around(
+                    10 + 6e-18, [ 10 + 1e-18, 10 + 7e-18, 10 + 3e-18 ], 2
+                )
+            }
+          ],
+          [ "10.000000000000000003", "10.000000000000000007" ], "correct result with long double";
     };
 };
 
