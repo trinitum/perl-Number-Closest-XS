@@ -7,17 +7,17 @@
 #define NUMBER long double
 #define ABS(x) fabsl(x)
 
-long double sv2number(SV* sv) {
+NUMBER sv2number(SV* sv) {
     I32 number_type;
-    long double res;
+    NUMBER res;
     if(SvIOK(sv)) {
-        res = (long double) SvIV(sv);
+        res = (NUMBER) SvIV(sv);
     } else if(SvNOK(sv)) {
         res = SvNV(sv);
     } else {
         number_type = looks_like_number(sv);
         if ((number_type & IS_NUMBER_IN_UV) && !(number_type & IS_NUMBER_NOT_INT)) {
-            res = (long double) SvIV(sv);
+            res = (NUMBER) SvIV(sv);
         } else {
             res = SvNV(sv);
         }
