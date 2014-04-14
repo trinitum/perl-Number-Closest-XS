@@ -4,8 +4,13 @@
 #include "ppport.h"
 #include <math.h>
 
+#if IVSIZE == 4
+#define NUMBER NVTYPE
+#define ABS(x) fabs(x)
+#else
 #define NUMBER long double
 #define ABS(x) fabsl(x)
+#endif
 
 NUMBER sv2number(SV* sv) {
     I32 number_type;
