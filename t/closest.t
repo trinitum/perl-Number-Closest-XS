@@ -30,6 +30,16 @@ subtest find_closest_numbers => sub {
         [qw(1.11 1.54)],
         "strings are coersed to numbers"
     );
+    eq_or_diff(
+        find_closest_numbers(10, [8, 11, 7, 9, 12], 5),
+        [11, 9, 8, 12, 7],
+        "sort is stable"
+    );
+    eq_or_diff(
+        find_closest_numbers(10, [9, 11, 7, 12, 8], 5),
+        [9, 11, 12, 8, 7],
+        "sort is stable"
+    );
 };
 
 subtest find_closest_numbers_around => sub {
