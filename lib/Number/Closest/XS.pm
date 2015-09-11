@@ -37,7 +37,9 @@ given.
 
 selects from the I<@list> up to I<$amount> numbers closest to the I<$num>. If
 I<$amount> is not specified, is assumed to be 1.  Returns reference to the
-array containing found numbers sorted by the distance from the I<$num>.
+array containing found numbers sorted by the distance from the I<$num>. The
+sort is stable, so the numbers that have the same distance to the C<$num> will
+be present in the result in the same order as in the C<@list>.
 Distance between C<$num> and C<$x> computed as C<abs($num - $x)>.
 
 =head2 find_closest_numbers_around($num, \@list, [$amount])
